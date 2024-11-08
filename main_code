@@ -1,0 +1,26 @@
+import telebot
+import requests
+from config import token
+
+bot = telebot.TeleBot('token') # Замените 'YOUR_BOT_TOKEN' на токен вашего бота
+
+@bot.message_handler(commands=['fact'])
+def handle_fact(message):
+    try:
+        # Запрос к API "Факты о животных"
+        response = requests.get('https://catfact.ninja/fact')
+        response.raise_for_status()  # Проверка статуса ответа
+
+        # Обработка ответа API
+        fact_data = response.json()
+        fact = fact_data['fact']
+
+        # Отправка сообщения с фактом
+        bot.reply_to(message, fact)
+        print("Факт отправлен успешно!") # Добавьте эту строку
+
+    except requests.exceptions.RequestException as e:
+        bot.reply_to(message, f"Ошибка получения факта: {e}")
+        print(f"Ошибка: {e}") # Добавьте эту строку
+
+bot.polling()
